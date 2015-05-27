@@ -1,16 +1,19 @@
 <!DOCTYPE html>
 <html>
 <head>
- 	<script src="http://code.jquery.com/jquery.min.js"></script>
- 	<link href="http://getbootstrap.com/dist/css/bootstrap.css" rel="stylesheet" type="text/css" />
- 	<script src="http://getbootstrap.com/dist/js/bootstrap.js"></script>
-   	
-	<!-- Shuffle! -->
-	<script src="{{ site.baseurl }}/dist/jquery.shuffle.js"></script>
- 	<meta charset=utf-8 />
- 	<title>JS Bin</title>
+ 	<script src="resources/js/jquery-2.1.4.min.js"></script>
+ 	<link href="resources/includes/bootstrap/css/bootstrap.css" rel="stylesheet" type="text/css" />
+ 	<script src="resources/includes/bootstrap/js/bootstrap.js"></script>
+   	<script src="resources/js/common.js"></script>
+ 	<meta charset="utf-8" />
+ 	<title>Crawler</title>
 	 <style type="text/css">
 	 	/* adjust body when menu is open */
+	 	body{
+	 		/*background-image: url('resources/img/body_bg.png');*/
+	 		background: #E9E9E9;
+	 	}
+
 		body.slide-active {
 		    overflow-x: hidden
 		}
@@ -148,7 +151,7 @@
 		/*overide*/
 		.navbar-inverse {
 		  background-color: #3a5795;
-		  border-color: #3a5795;
+		  border-color: #939393;
 		}
 
 		.form-control{
@@ -157,9 +160,48 @@
 		.btn{
 			border-radius: 0px;
 		}
+		.prod-item .thumbnail{
+			background: #fff;
+			-webkit-box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.22);
+			box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.22);
+			border-radius: 6px;
+			border: none;
+			float: left;
+			cursor: pointer;
+			cursor: -webkit-zoom-in;
+			cursor: zoom-in;
+		}
 
-		.prod-item{
+		.navbar-inverse{
+			box-shadow: 0px 5px 10px 0px;
+		}
 
+		.title{
+			border-bottom: 1px solid #e0e0e0;
+		}
+		.title h3{
+			overflow: hidden;
+			clear: both;
+			color: #444;
+			font-size: 14px;
+			font-weight: bold;
+			margin: 0;
+			max-height: 68px;
+			padding: 4px 0 4px;
+		}
+		.product-card__old-price {
+  			text-decoration: line-through;
+  		}
+  		.product-card__price {
+		  text-transform: uppercase;
+		  color: #d4232b;
+		  font-weight: bold;
+		  font-size: 14px;
+		  font-family: Helvetica,Arial,sans-serif;
+		}
+		.paging{
+			width: 100%;
+			float: left;
 		}
 
 	 </style>
@@ -227,25 +269,34 @@
 <div id="page-content">
    
   	<div class="container masonry-container" >
-    	<?php for($i=0; $i<20; $i++) { ?>
-	    	<div class="prod-item col-sm-6 col-md-3">
+  		<div id="content">
+    	<?php foreach ($products as $key => $prod) { ?>
+	    	<div class="prod-item item col-xs-12 col-sm-6 col-md-4 col-lg-3 box">
 			  <div class="thumbnail">
-			    <img src="http://lorempixel.com/200/200/abstract" alt="">
+			  	<?php if(!empty($prod['images'][0])) { ?>
+			    	<img src="<?php echo 'http://192.168.1.82/crawler_project/robot/'.$prod['images'][0]; ?>" alt="">
+			   	<?php } else { ?>
+			   		<img src="http://lorempixel.com/200/200/abstract">
+			   	<?php } ?>
 			    <div class="caption">
-			      <h3>Thumbnail label</h3>
-			      <p>...</p>
-			      <p>
-			        <a href="#" class="btn btn-primary" role="button">Button</a> 
-			        <a href="#" class="btn btn-default" role="button">Button</a>
-			      </p>
+			      <div class="title">
+			      	<h3><?php echo $prod['name'] ?></h3>
+			      </div>
+			      <div class="product-card__old-price"><?php echo $prod['price']['old'] ?></div>
+			      <div class="product-card__price"><?php echo $prod['price']['curr'] ?></div>
 			    </div>
 			  </div>
 			</div> 
 		<?php } ?>
-
+		</div>
+		<!-- paging -->
+		<div class="paging">
+			<div class="pull-right">
+		  		<?php if(!empty($pagination)) { echo $pagination; }?>
+		  	</div>
+		</div>
    	</div>
-  	<!-- /.container -->
-  
+  	<!-- /.container -->  	
 </div>
 <!-- /#page-content -->
 
@@ -254,8 +305,6 @@
 
 <script type="text/javascript">
 	$(document).ready(function () {
-
-
 	    //stick in the fixed 100% height behind the navbar but don't wrap it
 	    $('#slide-nav.navbar .container').append($('<div id="navbar-height-col"></div>'));
 
@@ -317,50 +366,6 @@
 
 	});
 </script>
-
-
-<script type="text/javascript">
-	/* Demo Scripts for Making Twitter Bootstrap 3 Tab Play Nicely With The Masonry Library
-	* on SitePoint by Maria Antonietta Perna
-	*/
-
-	//Initialize Masonry inside Bootstrap 3 Tab component 
-
-	/*(function( $ ) {
-
-		var $container = $('.masonry-container');
-		$container.imagesLoaded( function () {
-			$container.masonry({
-				columnWidth: '.prod-item',
-				itemSelector: '.prod-item'
-			});
-		});
-		
-		//Reinitialize masonry inside each panel after the relative tab link is clicked - 
-		$('a[data-toggle=tab]').each(function () {
-			var $this = $(this);
-
-			$this.on('shown.bs.tab', function () {
-			
-				$container.imagesLoaded( function () {
-					$container.masonry({
-						columnWidth: '.prod-item',
-						itemSelector: '.prod-item'
-					});
-				});
-
-			}); //end shown
-		});  //end each
-		
-	})(jQuery);*/
-	$(document).ready(function() {
-	  var $grid = $('.masonry-container'),
-	      $sizer = $grid.find('.prod-item');
-
-	  $grid.shuffle({
-	    itemSelector: '.picture-item',
-	    sizer: $sizer
-	  });
-	});
-
-</script>
+<script src="resources/includes/masonry/imagesloaded.3.1.8.min.js"></script>
+<script src="resources/includes/masonry/jquery.masonry.3.2.1.min.js"></script>
+<script src="resources/includes/masonry/base.js" type="text/javascript"></script>
